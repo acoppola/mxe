@@ -1,0 +1,2 @@
+PREFIX =$/home/acoppola/mxe/usr/i686-w64-mingw32.static
+PREFIX_H =$/home/acoppola/mxe/usr/i686-w64-mingw32.static/include/SDL
