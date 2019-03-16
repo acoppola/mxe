@@ -7,16 +7,27 @@ $(PKG)_IGNORE   :=
 $(PKG)_VERSION  := 1085c49
 $(PKG)_CHECKSUM := 04678a7c317e9a12c6fdc613136e21a8e97f837d6b8952a996aa62c25ce6da34
 $(PKG)_GH_CONF  := flibitijibibo/libSGE/branches/master
-$(PKG)_DEPS     := cc freetype sdl sdl_image
+$(PKG)_DEPS     := cc sdl sdl_image
 
 
 define $(PKG)_BUILD
     cd '$(1)'
     echo '$(PREFIX)/$(TARGET)'
-    $(SED) -i 's,(shell sdl-config --prefix),$(PREFIX)/$(TARGET),gpw output' '$(1)/Makefile.conf'
-    $(MAKE) -C '$(1)' -j '$(JOBS)'
-    $(MAKE) -C '$(1)' -j 1 shared
-    $(MAKE) -C '$(1)' -j 1 install
-    cp $(1)/libSGE.a ~/mxe/usr/i686-w64-mingw32.static/lib/libSGE.a
-	cp $(1)/sge*.h ~/mxe/usr/i686-w64-mingw32.static/include/SDL/
+#    $(SED) -i 's,C_COMP = y,#C_COMP = y,gpw outpt' '$(1)/Makefile.conf'
+#    $(SED) -i 's,"$(shell sdl-config --prefix)",$(PREFIX)/$(TARGET),gpw output' '$(1)/Makefile.conf'
+#    $(SED) -i 's,USE_IMG = n,USE_IMG = y,gpw output' '$(1)/Makefile'
+    $(SED) -i "s,ifdef __WIN32__,if 0,g" '$(1)/sge_surface.cpp'
+    $(SED) -i "s,ifdef __WIN32__,if 0,g" '$(1)/sge_textpp.cpp'
+    $(SED) -i "s,ifdef __WIN32__,if 0,g" '$(1)/sge_tt_text.cpp'
+    $(SED) -i "s,ifdef __WIN32__,if 0,g" '$(1)/sge_bm_text.cpp'
+    $(SED) -i 's,dlltool,i686-w64-mingw32-dlltool,gp' '$(1)/Makefile'
+    $(SED) -i 's,dllwrap,i686-w64-mingw32-dllwrap,gp' '$(1)/Makefile'
+    $(MAKE) CXX=$(TARGET)-g++ CC=$(TARGET)-gcc PREFIX=$(PREFIX)/$(TARGET) PREFIX_H=$(PREFIX)/$(TARGET)/include/SDL SGE_LIBS='$(PREFIX)/$(TARGET)/lib -lstdc++' HAVE_IMG=y -C '$(1)' -j 1
+#    $(MAKE) -C '$(1)' -j '$(JOBS)'
+#    $(MAKE) -C '$(1)' -j 1 shared
+#    $(MAKE) -C '$(1)' -j 1 dll
+#    $(MAKE) -C '$(1)' -j 1 install
+#    cp $(1)/libSGE.so $(PREFIX)/$(TARGET)/lib/libSGE.so
+    cp $(1)/libSGE.a $(PREFIX)/$(TARGET)/lib/libSGE.a
+    cp $(1)/sge*.h $(PREFIX)/$(TARGET)/include/SDL
 endef
